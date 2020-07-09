@@ -3,10 +3,12 @@ package studentskills.mytree;
 public class BST implements Cloneable{
 
 
+	private final int treeID;
 	SubjectI root;
 	
 	public BST()
 	{
+		treeID = Utility.getUniqueId();
 		root = null;
 	}
 	
@@ -32,7 +34,9 @@ public class BST implements Cloneable{
 		}
 	}
 
+	public int getTreeID() {
+		return treeID;
+	}
 
-	
-	
+
 }

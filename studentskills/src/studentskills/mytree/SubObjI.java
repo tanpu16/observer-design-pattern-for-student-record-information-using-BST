@@ -1,6 +1,7 @@
 package studentskills.mytree;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public interface SubObjI {
@@ -10,7 +11,10 @@ public interface SubObjI {
 	public void update(SubjectI oldNode, SubjectI newNode);
 	public void insertUpdateNode(BST bst,SubjectI node);
 	
-	public SubjectI Search(SubjectI key,SubjectI root);
+	public SubjectI Search(int key,SubjectI root);
+	
+	public void registerObservers(ObserverI obs1,ObserverI obs2);
+	
 	/*
 	int bNumber = 0;
 	String firstName = null ,lastName = null ,major = null;
@@ -51,4 +55,8 @@ public interface SubObjI {
 	public SubjectI getRight();
 
 	public void setRight(SubjectI rightIn);
+	
+	public List<ObserverI> getObservers();
+	
+	public void setObservers(List<ObserverI> observersIn);
 }

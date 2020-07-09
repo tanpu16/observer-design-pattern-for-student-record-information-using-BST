@@ -1,5 +1,7 @@
 package studentskills.mytree;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -12,6 +14,7 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 	private SubjectI left;
 	private SubjectI right;
 	
+	private List<ObserverI> Observers;
 	
 	public StudentRecord(int bNumberIn, String firstNameIn, String lastNameIn, double gpaIn, String majorIn, Set<String> skillIn)
 	{
@@ -23,21 +26,23 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 		setSkills(skillIn);
 		setLeft(null);	
 		setRight(null);
+		setObservers(new ArrayList<>());		
 	}
 	
 
 
+	//@SuppressWarnings("deprecation")
 	@Override
 	protected StudentRecord clone() throws CloneNotSupportedException {
 		StudentRecord clone = null;
         try{
             clone = (StudentRecord)super.clone()	;
  
-            clone.firstName = new String(clone.getFirstName());
-            clone.lastName = new String(clone.getLastName());
-            clone.gpa = new Double(clone.getGpa());
-            clone.bNumber = new Integer(clone.getbNumber());
-            clone.major = new String(clone.getMajor());
+            //clone.firstName = new String(clone.getFirstName());
+            //clone.lastName = new String(clone.getLastName());
+            //clone.gpa = new Double(clone.getGpa());
+            //clone.bNumber = new Integer(clone.getbNumber());
+            //clone.major = new String(clone.getMajor());
             clone.left = clone.getLeft();
             clone.right = clone.getRight();
             clone.skills = new HashSet<String>(clone.getSkills());
@@ -198,19 +203,7 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 		}
 	}
 	
-	/*
-	public void display(SubjectI root)
-	{
-	
-		if(null != root)
-		{
-			display(root.getLeft());
-			System.out.println(" "+root.getbNumber()+"  "+root.getSkills()+" "+root.getFirstName()+" "+root.getLastName()+" "+root.getGpa()+" "+root.getMajor());
-			display(root.getRight());
-		}
-	}
-	*/
-	public SubjectI Search(SubjectI key,SubjectI root)
+	public SubjectI Search(int key,SubjectI root)
 	{
 	
 		SubjectI temp = null;
@@ -220,15 +213,15 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 		}
 		else
 		{
-			if(root.getbNumber() == key.getbNumber())
+			if(root.getbNumber() == key)
 			{
-				temp = key;
+				temp = root;
 			}
-			else if(root.getbNumber() < key.getbNumber())
+			else if(root.getbNumber() < key)
 			{
 				 temp = Search(key,root.getRight());
 			}
-			else if(root.getbNumber() > key.getbNumber())
+			else if(root.getbNumber() > key)
 			{
 				temp = Search(key,root.getLeft());
 			}
@@ -236,6 +229,25 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 		return temp;
 	}
 
+
+
+	public List<ObserverI> getObservers() {
+		return Observers;
+	}
+
+
+
+	public void setObservers(List<ObserverI> observersIn) {
+		Observers = observersIn;
+	}
+
+
+
+	public void registerObservers(ObserverI obs1,ObserverI obs2)
+	{
+		Observers.add(obs1);
+		Observers.add(obs2);
+	}
 
 
 	

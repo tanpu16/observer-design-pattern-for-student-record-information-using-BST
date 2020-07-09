@@ -12,18 +12,20 @@ import studentskills.util.Results;
 
 public class TreeHelper {
 	
-	int bNumber;
-	String firstName,lastName,major;
-	double gpa;
+
 	boolean invalidInput,isEmptyFile;
+
+	BST treeClone0;
+	BST treeClone1;
+	BST treeClone2;
+	
+	SubjectI clone0;
+	SubjectI clone1;
+	SubjectI clone2;
 	
 	public TreeHelper()
 	{
-		bNumber = 0;
-		firstName = null;
-		lastName = null;
-		major = null;
-		gpa = 0.0;
+
 		invalidInput = false;
 		isEmptyFile = false;
 	}
@@ -46,12 +48,16 @@ public class TreeHelper {
 	@see just an helper function for performing different operations on input.txt file like parse the input
 	store videos, calculate metrics then store output and display exceptions
 	*/
-	public void InputParser(FileProcessor fp,Results res) throws IOException, CloneNotSupportedException
+	public void InputParser(FileProcessor fp) throws IOException, CloneNotSupportedException
 	{
+		int bNumber;
+		String firstName,lastName,major;
+		double gpa;
 		
-		BST bst = new BST();
-		BST TreeClone1 = (bst).clone();
-		BST TreeClone2 = (bst).clone();
+		treeClone0 = new BST();
+		treeClone1 = (treeClone0).clone();
+		treeClone2 = (treeClone0).clone();
+
 		try
 		{
 			String line = fp.poll();
@@ -90,36 +96,43 @@ public class TreeHelper {
 				 
 				 
 					 
-				 SubjectI node = new StudentRecord(bNumber,firstName,lastName,gpa,major,skill);
-				 SubjectI Clone1 = ((StudentRecord)node).clone();
-					 SubjectI tempNode = node.Search(node, bst.root);
-				//System.out.println("in helper out original "+node.getFirstName()+" clone "+Clone1.getFirstName());
-					 
-				 //System.out.println("  "+node+"  "+Clone1);
+				 SubjectI clone0 = new StudentRecord(bNumber,firstName,lastName,gpa,major,skill);
+				 SubjectI clone1 = ((StudentRecord)clone0).clone();
+				 SubjectI clone2 = ((StudentRecord)clone0).clone();
+				 
+				 clone0.registerObservers((StudentRecord)clone1, (StudentRecord)clone2);
+				 clone1.registerObservers((StudentRecord)clone0, (StudentRecord)clone2);
+				 clone2.registerObservers((StudentRecord)clone0, (StudentRecord)clone1);
+				
+				 
+				 SubjectI tempNode = clone0.Search(clone0.getbNumber(), treeClone0.root);
+				 
+
 				 if(null != tempNode)	
 				 {
-					 //System.out.println("in helper "+tempNode.getbNumber());
-					 node.insertUpdateNode(bst, node);
-					 //System.out.println("*****in helper out original "+node.getFirstName()+node.getGpa()+" clone "+Clone1.getFirstName()+Clone1.getGpa());
+					 clone0.insertUpdateNode(treeClone0, clone0);
+					 //clone1.insertUpdateNode(treeClone1, clone1);
+					 clone2.insertUpdateNode(treeClone2, clone2);
 				 }
 				 else
 				 {
-					 //System.out.println("in insert "+node.bNumber);
-					 node.insert(bst,node);
-					 node.insert(TreeClone1,Clone1);
+					 clone0.insert(treeClone0,clone0);
+					 clone1.insert(treeClone1,clone1);
+					 clone2.insert(treeClone2,clone2);
 				 }
-				 //System.out.println(" "+bNumber+" "+firstName+" "+lastName+" "+gpa+" "+major+" "+skill);
-				 //System.out.println("in helper out original "+node.firstName+" clone "+Clone1.firstName);
+
 
 				 line = fp.poll();
 			}
 
-			//System.out.println("test");
-			bst.display(bst.root);
+			System.out.println("Replica tree 0");
+			treeClone0.display(treeClone0.root);
 			
-			System.out.println("Replica tree");
+			System.out.println("Replica tree 1");
+			treeClone1.display(treeClone1.root);
 			
-			TreeClone1.display(TreeClone1.root);
+			System.out.println("Replica tree 2");
+			treeClone2.display(treeClone2.root);
 			 
 		}
 		catch(Exception e)
@@ -152,7 +165,76 @@ public class TreeHelper {
 		{
 			fp.close();
 		}
+		
+
 	}
-	
+
+	public void modFileParser(FileProcessor fp) throws IOException
+	{
+		int bNumber, replicaID;
+		String oldValue,newValue;
+		
+		try
+		{
+			String line = fp.poll();
+			
+			if(null == line)
+			{
+				isEmptyFile = true;
+			}
+			
+			while(null != line)
+			{
+				if(line.contains(" "))
+				{
+					invalidInput = true;
+				}
+				 
+				
+				String split[] = line.split(",");
+				replicaID = Integer.parseInt(split[0]);
+				bNumber = Integer.parseInt(split[1]);
+				String temp = split[2];
+				oldValue = temp.replaceAll("^|:.*$","");
+				newValue = temp.replaceAll("^.*:|$","");
+				 
+				 //System.out.println("In modify "+replicaID+" "+bNumber+" "+oldValue+" "+newValue);
+				 
+				 line = fp.poll();
+			}
+			
+				 
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			System.exit(0);
+		}
+		finally
+		{
+			fp.close();
+		}
+		try
+		{
+			if(invalidInput)
+			{
+				throw new Exception("Invalid Input! Exiting!!!");
+			}
+			else if(isEmptyFile)
+			{
+				throw new Exception("File is Empty! Exiting!!!");
+			}
+			
+		}
+		catch(Exception ie)
+		{
+			ie.printStackTrace();
+			System.exit(0);
+		}
+		finally
+		{
+			fp.close();
+		}
+	}
 
 }

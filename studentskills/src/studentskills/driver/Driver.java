@@ -29,12 +29,15 @@ public class Driver {
 		
 		FileProcessor fp = null;
 		TreeHelper hp = new TreeHelper();
-		Results res = new Results(args[1]);
+		//Results inputRes = new Results(args[0]);
+		//Results modRes = new Results(args[1]);
 		try 
 		{
 			fp = new FileProcessor(args[0]);
-			hp.InputParser(fp,res);
+			hp.InputParser(fp);
 		
+			fp = new FileProcessor(args[1]);
+			hp.modFileParser(fp);
 
 		} 
 		catch (InvalidPathException | SecurityException | IOException e) {
