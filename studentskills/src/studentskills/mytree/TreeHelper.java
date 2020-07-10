@@ -6,8 +6,10 @@ import java.util.HashSet;
 
 import java.util.Set;
 
+import studentskills.util.FileDisplayInterface;
 import studentskills.util.FileProcessor;
 import studentskills.util.Results;
+import studentskills.util.StdoutDisplayInterface;
 
 
 public class TreeHelper {
@@ -22,6 +24,7 @@ public class TreeHelper {
 	SubjectI clone0;
 	SubjectI clone1;
 	SubjectI clone2;
+	
 	
 	public TreeHelper()
 	{
@@ -55,8 +58,8 @@ public class TreeHelper {
 		double gpa;
 		
 		treeClone0 = new BST();
-		treeClone1 = (treeClone0).clone();
-		treeClone2 = (treeClone0).clone();
+		treeClone1 = new BST();
+		treeClone2 = new BST();
 
 		try
 		{
@@ -95,36 +98,41 @@ public class TreeHelper {
 				 }
 				 
 				 
-					 
-				 SubjectI clone0 = new StudentRecord(bNumber,firstName,lastName,gpa,major,skill);
-				 SubjectI clone1 = ((StudentRecord)clone0).clone();
-				 SubjectI clone2 = ((StudentRecord)clone0).clone();
+				 clone0 = new StudentRecord(bNumber,firstName,lastName,gpa,major,skill);
+				 clone1 = ((StudentRecord)clone0).clone();
+				 clone2 = ((StudentRecord)clone0).clone();
+				 SubjectI tempNode = Search(bNumber, treeClone0.root);
 				 
-				 clone0.registerObservers((StudentRecord)clone1, (StudentRecord)clone2);
-				 clone1.registerObservers((StudentRecord)clone0, (StudentRecord)clone2);
+				 clone0.registerObservers((StudentRecord)clone1,(StudentRecord)clone2);
+				 clone1.registerObservers((StudentRecord)clone0,(StudentRecord)clone2);
 				 clone2.registerObservers((StudentRecord)clone0, (StudentRecord)clone1);
-				
 				 
-				 SubjectI tempNode = clone0.Search(clone0.getbNumber(), treeClone0.root);
 				 
-
-				 if(null != tempNode)	
+				 
+				 if(null == tempNode)
 				 {
-					 clone0.insertUpdateNode(treeClone0, clone0);
-					 //clone1.insertUpdateNode(treeClone1, clone1);
-					 clone2.insertUpdateNode(treeClone2, clone2);
+					  
+					 insert(treeClone0,clone0);
+					 insert(treeClone1,clone1);
+					 insert(treeClone2,clone2);	 
+					 
+					 
 				 }
 				 else
 				 {
-					 clone0.insert(treeClone0,clone0);
-					 clone1.insert(treeClone1,clone1);
-					 clone2.insert(treeClone2,clone2);
+					 insertUpdateNode(treeClone0, clone0);
+					 clone0.notifyAll(tempNode,null,null, Operation.INSERT);
 				 }
+				 
 
-
+				 //System.out.println("in input : "+clone0.getFirstName()+" "+clone1.getFirstName()+" "+clone2.getFirstName());
+				 
+				 //System.out.println("observers "+clone1.getObservers());
+				 
 				 line = fp.poll();
 			}
 
+			/*
 			System.out.println("Replica tree 0");
 			treeClone0.display(treeClone0.root);
 			
@@ -133,6 +141,7 @@ public class TreeHelper {
 			
 			System.out.println("Replica tree 2");
 			treeClone2.display(treeClone2.root);
+			*/
 			 
 		}
 		catch(Exception e)
@@ -148,15 +157,15 @@ public class TreeHelper {
 		{
 			if(invalidInput)
 			{
-				throw new Exception("Invalid Input! Exiting!!!");
+				throw new IOException("Invalid Input! Exiting!!!");
 			}
 			else if(isEmptyFile)
 			{
-				throw new Exception("File is Empty! Exiting!!!");
+				throw new IOException("File is Empty! Exiting!!!");
 			}
 			
 		}
-		catch(Exception ie)
+		catch(IOException ie)
 		{
 			ie.printStackTrace();
 			System.exit(0);
@@ -169,7 +178,7 @@ public class TreeHelper {
 
 	}
 
-	public void modFileParser(FileProcessor fp) throws IOException
+	public void modFileParser(FileProcessor fp,FileDisplayInterface outputRes1,FileDisplayInterface outputRes2,FileDisplayInterface outputRes3,StdoutDisplayInterface outStdout1,StdoutDisplayInterface outStdout2,StdoutDisplayInterface outStdout3) throws IOException
 	{
 		int bNumber, replicaID;
 		String oldValue,newValue;
@@ -198,14 +207,35 @@ public class TreeHelper {
 				oldValue = temp.replaceAll("^|:.*$","");
 				newValue = temp.replaceAll("^.*:|$","");
 				 
-				 //System.out.println("In modify "+replicaID+" "+bNumber+" "+oldValue+" "+newValue);
-				 
+				SubjectI tempNode = null;
+				
+				if(replicaID == treeClone0.getTreeID())
+				{
+					tempNode = Search(bNumber, treeClone0.root);
+					
+				}
+				else if(replicaID == treeClone1.getTreeID())
+				{
+					tempNode = Search(bNumber, treeClone1.root);
+				}
+				else if(replicaID == treeClone2.getTreeID())
+				{
+					 tempNode = Search(bNumber, treeClone2.root);
+					
+				}
+				tempNode.updateSubjectNode(tempNode,oldValue,newValue);
+				tempNode.notifyAll(tempNode,oldValue,newValue,Operation.MODIFY);
+			
 				 line = fp.poll();
 			}
 			
+			
+			printNodes((Results)outputRes1,(Results)outStdout1,treeClone0.root);
+			printNodes((Results)outputRes2,(Results)outStdout2,treeClone1.root);
+			printNodes((Results)outputRes3,(Results)outStdout3,treeClone2.root);
 				 
 		}
-		catch(Exception e)
+		catch(IOException e)
 		{
 			e.printStackTrace();
 			System.exit(0);
@@ -218,15 +248,15 @@ public class TreeHelper {
 		{
 			if(invalidInput)
 			{
-				throw new Exception("Invalid Input! Exiting!!!");
+				throw new IOException("Invalid Input! Exiting!!!");
 			}
 			else if(isEmptyFile)
 			{
-				throw new Exception("File is Empty! Exiting!!!");
+				throw new IOException("File is Empty! Exiting!!!");
 			}
 			
 		}
-		catch(Exception ie)
+		catch(IOException ie)
 		{
 			ie.printStackTrace();
 			System.exit(0);
@@ -236,5 +266,137 @@ public class TreeHelper {
 			fp.close();
 		}
 	}
+	
+	public void insert(BST bst,SubjectI node)
+	{
+		if(null == bst.root)
+		{
+			bst.root = node;
+			return;
+		}
+		SubjectI current = bst.root;
+		SubjectI parent = null;
+		while(true)
+		{
+			parent = current;
+			if(node.getbNumber() == parent.getbNumber())
+			{
+				parent = node;
+				return;
+			}
+			else if(node.getbNumber() < current.getbNumber())
+			{
+				current = current.getLeft();
+				if(null == current)
+				{
+					parent.setLeft(node);
+					return;
+				}
+					
+			}
+			else if(node.getbNumber() > current.getbNumber())
+			{
+				current = current.getRight();
+				if(null == current)
+				{
+					parent.setRight(node);
+					return;
+				}
+			}
+
+		}
+		
+	}
+	
+
+	public void setEntry(SubjectI oldNode, SubjectI newNode)
+	{
+		oldNode.setFirstName(newNode.getFirstName());
+		oldNode.setLastName(newNode.getLastName());
+		oldNode.setGpa(newNode.getGpa());
+		oldNode.setMajor(newNode.getMajor());
+		oldNode.getSkills().addAll(newNode.getSkills());
+	}
+	
+	public void insertUpdateNode(BST bst,SubjectI node)
+	{
+		SubjectI current = bst.root;
+		SubjectI parent = null;
+		while(true)
+		{
+			parent = current;
+			if(node.getbNumber() == parent.getbNumber())
+			{
+				setEntry(parent,node);
+				return;
+			}
+			else if(node.getbNumber() < current.getbNumber())
+			{
+				current = current.getLeft();
+				if(null == current)
+				{
+					setEntry(parent,node);
+					return;
+				}
+					
+			}
+			else if(node.getbNumber() > current.getbNumber())
+			{
+				current = current.getRight();
+				if(null == current)
+				{
+					setEntry(parent,node);
+					return;
+				}
+			}
+
+		}
+		
+
+	}
+	
+	public SubjectI Search(int key,SubjectI root)
+	{
+	
+		SubjectI temp = null;
+		if(null == root)
+		{
+			return temp;
+		}
+		else
+		{
+			if(root.getbNumber() == key)
+			{
+				temp = root;
+			}
+			else if(root.getbNumber() < key)
+			{
+				 temp = Search(key,root.getRight());
+			}
+			else if(root.getbNumber() > key)
+			{
+				temp = Search(key,root.getLeft());
+			}
+		}
+		return temp;
+	}
+	
+	public void printNodes(Results outRes,Results outStd, SubjectI root)
+	{
+		if(null != root)
+		{
+			printNodes(outRes,outStd,root.getLeft());
+			outRes.store(String.valueOf(root.getbNumber()));
+			outRes.store(":");
+			outRes.store(String.join(",",root.getSkills()));
+			outRes.store("\n");
+			outStd.store(String.valueOf(root.getbNumber()));
+			outStd.store(":");
+			outStd.store(String.join(",",root.getSkills()));
+			outStd.store("\n");
+			printNodes(outRes,outStd,root.getRight());
+		}
+	}
+
 
 }

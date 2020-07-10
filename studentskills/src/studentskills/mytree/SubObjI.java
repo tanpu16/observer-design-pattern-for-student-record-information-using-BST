@@ -7,11 +7,15 @@ import java.util.Set;
 public interface SubObjI {
 
 	
-	public void insert(BST bst,SubjectI node);
-	public void update(SubjectI oldNode, SubjectI newNode);
-	public void insertUpdateNode(BST bst,SubjectI node);
+	//public void insert(BST bst,SubjectI node);
+	//public void update(SubjectI oldNode, SubjectI newNode);
+	//public void insertUpdateNode(BST bst,SubjectI node);
 	
-	public SubjectI Search(int key,SubjectI root);
+	//public SubjectI Search(int key,SubjectI root);
+	
+	//public void updateNode(SubjectI tempNode,SubjectI root,String oldValue,String newValue);
+
+	public void update(SubjectI node, SubjectI observer, String oldValue, String newValue, Operation op);
 	
 	public void registerObservers(ObserverI obs1,ObserverI obs2);
 	
@@ -57,6 +61,6 @@ public interface SubObjI {
 	public void setRight(SubjectI rightIn);
 	
 	public List<ObserverI> getObservers();
-	
+
 	public void setObservers(List<ObserverI> observersIn);
 }

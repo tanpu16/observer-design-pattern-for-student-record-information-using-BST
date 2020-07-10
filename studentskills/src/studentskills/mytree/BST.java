@@ -3,7 +3,7 @@ package studentskills.mytree;
 public class BST implements Cloneable{
 
 
-	private final int treeID;
+	public final int treeID;
 	SubjectI root;
 	
 	public BST()

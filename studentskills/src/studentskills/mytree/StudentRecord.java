@@ -1,6 +1,7 @@
 package studentskills.mytree;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 	private SubjectI left;
 	private SubjectI right;
 	
-	private List<ObserverI> Observers;
+	private List<ObserverI> observers;
 	
 	public StudentRecord(int bNumberIn, String firstNameIn, String lastNameIn, double gpaIn, String majorIn, Set<String> skillIn)
 	{
@@ -26,12 +27,9 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 		setSkills(skillIn);
 		setLeft(null);	
 		setRight(null);
-		setObservers(new ArrayList<>());		
+		setObservers(new ArrayList<>());
 	}
 	
-
-
-	//@SuppressWarnings("deprecation")
 	@Override
 	protected StudentRecord clone() throws CloneNotSupportedException {
 		StudentRecord clone = null;
@@ -46,6 +44,7 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
             clone.left = clone.getLeft();
             clone.right = clone.getRight();
             clone.skills = new HashSet<String>(clone.getSkills());
+            clone.observers = new ArrayList<ObserverI>();
             
         }catch(CloneNotSupportedException cns){ 
             System.out.println("Error while cloning programmer"+cns);
@@ -117,138 +116,102 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 		right = rightIn;
 	}  
 	
-	public void insert(BST bst,SubjectI node)
-	{
-		if(null == bst.root)
-		{
-			bst.root = node;
-			return;
-		}
-		SubjectI current = bst.root;
-		SubjectI parent = null;
-		while(true)
-		{
-			parent = current;
-			if(node.getbNumber() == parent.getbNumber())
-			{
-				parent = node;
-				return;
-			}
-			else if(node.getbNumber() < current.getbNumber())
-			{
-				current = current.getLeft();
-				if(null == current)
-				{
-					parent.setLeft(node);
-					return;
-				}
-					
-			}
-			else if(node.getbNumber() > current.getbNumber())
-			{
-				current = current.getRight();
-				if(null == current)
-				{
-					parent.setRight(node);
-					return;
-				}
-			}
-
-		}
-		
-	}
-	
-	public void update(SubjectI oldNode, SubjectI newNode)
-	{
-		oldNode.setFirstName(newNode.getFirstName());
-		oldNode.setLastName(newNode.getLastName());
-		oldNode.setGpa(newNode.getGpa());
-		oldNode.setMajor(newNode.getMajor());
-		oldNode.getSkills().addAll(newNode.getSkills());
-	
-	}
-	public void insertUpdateNode(BST bst,SubjectI node)
-	{
-		
-		SubjectI current = bst.root;
-		SubjectI parent = null;
-		while(true)
-		{
-			parent = current;
-			if(node.getbNumber() == parent.getbNumber())
-			{
-				update(parent,node);
-				return;
-			}
-			else if(node.getbNumber() < current.getbNumber())
-			{
-				current = current.getLeft();
-				if(null == current)
-				{
-					update(parent,node);
-					return;
-				}
-					
-			}
-			else if(node.getbNumber() > current.getbNumber())
-			{
-				current = current.getRight();
-				if(null == current)
-				{
-					update(parent,node);
-					return;
-				}
-			}
-
-		}
-	}
-	
-	public SubjectI Search(int key,SubjectI root)
-	{
-	
-		SubjectI temp = null;
-		if(null == root)
-		{
-			return temp;
-		}
-		else
-		{
-			if(root.getbNumber() == key)
-			{
-				temp = root;
-			}
-			else if(root.getbNumber() < key)
-			{
-				 temp = Search(key,root.getRight());
-			}
-			else if(root.getbNumber() > key)
-			{
-				temp = Search(key,root.getLeft());
-			}
-		}
-		return temp;
-	}
-
-
-
-	public List<ObserverI> getObservers() {
-		return Observers;
-	}
-
-
-
-	public void setObservers(List<ObserverI> observersIn) {
-		Observers = observersIn;
-	}
-
-
-
 	public void registerObservers(ObserverI obs1,ObserverI obs2)
 	{
-		Observers.add(obs1);
-		Observers.add(obs2);
+		
+		observers.add(obs1);
+		observers.add(obs2);
+		
 	}
 
-
+	public void update(SubjectI node,SubjectI observer, String oldValue, String newValue, Operation op)
+	{
+		if(op == Operation.MODIFY)
+		{
+			
+			if(observer.getFirstName().equals(oldValue))
+			{
+				observer.setFirstName(newValue);
+			}
+			else if(observer.getLastName().equals(oldValue))
+			{
+				observer.setLastName(newValue);
+			}
+			else if(observer.getMajor().equals(oldValue))
+			{
+				observer.setMajor(newValue);
+			}
+			else 
+			{
+				for(String itr : observer.getSkills())
+				{
+					if(itr.equals(oldValue))
+					{
+						observer.getSkills().remove(oldValue);
+						observer.getSkills().add(newValue);
+					}
+				}
+			}
+		}
 	
+		else if(op == Operation.INSERT)
+		{
+						
+			observer.setFirstName(node.getFirstName());
+			observer.setLastName(node.getLastName());
+			observer.setGpa(node.getGpa());
+			observer.setMajor(node.getMajor());
+			observer.getSkills().addAll(node.getSkills());
+		}
+	
+	}
+	
+	
+	public void updateSubjectNode(SubjectI node,String oldValue,String newValue)
+	{
+		if(node.getFirstName().equals(oldValue))
+		{
+			node.setFirstName(newValue);
+		}
+		else if(node.getLastName().equals(oldValue))
+		{
+			node.setLastName(newValue);
+		}
+		else if(node.getMajor().equals(oldValue))
+		{
+			node.setMajor(newValue);
+		}
+		else 
+		{
+			for(String itr : node.getSkills())
+			{
+				if(itr.equals(oldValue))
+				{
+					node.getSkills().remove(oldValue);
+					node.getSkills().add(newValue);
+				}
+			}
+		}
+	}
+	
+
+	public void notifyAll(SubjectI node,String oldValue, String newValue, Operation op)
+	{
+		
+		ObserverI observer1 = node.getObservers().get(0);
+		ObserverI observer2 = node.getObservers().get(1);
+		
+		observer1.update(node,(StudentRecord)observer1,oldValue,newValue,op);
+		observer2.update(node,(StudentRecord)observer2,oldValue,newValue,op);
+	
+	}
+
+	public List<ObserverI> getObservers() {
+		return observers;
+	}
+
+	public void setObservers(List<ObserverI> observersIn) {
+			observers = observersIn;
+	}
+
 }
