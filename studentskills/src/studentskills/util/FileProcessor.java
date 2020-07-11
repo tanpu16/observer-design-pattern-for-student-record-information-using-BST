@@ -8,6 +8,9 @@ import java.io.FileNotFoundException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import studentskills.util.MyLogger.DebugLevel;
+
 import java.nio.file.InvalidPathException;
 
 /**
@@ -34,7 +37,7 @@ public final class FileProcessor {
 		if (!Files.exists(Paths.get(inputFilePath))) {
 			throw new FileNotFoundException("invalid input file or input file in incorrect location");
 		}
-
+		MyLogger.writeMessage("File processor constructor called", DebugLevel.CONSTRUCTOR);
 		reader = new BufferedReader(new FileReader(new File(inputFilePath)));
 	}
 
@@ -45,6 +48,7 @@ public final class FileProcessor {
 	* @exception IOException On error encountered when reading from input file.
 	*/
 	public String poll() throws IOException {
+		MyLogger.writeMessage("File processors poll method called to fetch each line", DebugLevel.FILE_PROCESSOR);
 		return reader.readLine();
 	}
 
@@ -54,6 +58,7 @@ public final class FileProcessor {
 	* @exception IOException On error encountered when closing the buffered reader.
 	*/
 	public void close() throws IOException {
+		MyLogger.writeMessage("File processors close method called to close the file", DebugLevel.FILE_PROCESSOR);
 		reader.close();
 	}
 }

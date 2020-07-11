@@ -1,6 +1,5 @@
 package studentskills.driver;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
@@ -9,8 +8,6 @@ import studentskills.util.FileDisplayInterface;
 import studentskills.util.FileProcessor;
 import studentskills.util.MyLogger;
 import studentskills.util.Results;
-import studentskills.util.StdoutDisplayInterface;
-import studentskills.mytree.SubjectI;
 import studentskills.mytree.TreeHelper;
 
 /**
@@ -46,12 +43,7 @@ public class Driver {
 		FileDisplayInterface outputRes3 = new Results(args[4]);
 		
 		FileDisplayInterface errorRes = new Results(args[5]);
-		
-		//System.out.println(args[5].toString());
-		//StdoutDisplayInterface outStdout1 = new Results(args[1]);
-		//StdoutDisplayInterface outStdout2 = new Results(args[1]);
-		//StdoutDisplayInterface outStdout3 = new Results(args[1]);
-		//Results modRes = new Results(args[1]);
+
 		
 			fp = new FileProcessor(args[0]);
 			hp.InputParser(fp,errorRes);

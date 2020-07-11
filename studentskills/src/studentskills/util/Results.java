@@ -3,6 +3,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.InvalidPathException;
+
+import studentskills.util.MyLogger.DebugLevel;
+
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 
@@ -13,6 +16,7 @@ public class Results implements FileDisplayInterface, StdoutDisplayInterface {
 	//parameterized constructor
 	public Results(String FilePath) 
 	{
+		MyLogger.writeMessage("Results constructor called", DebugLevel.CONSTRUCTOR);
 		path = FilePath;
 	}
 
@@ -26,7 +30,7 @@ public class Results implements FileDisplayInterface, StdoutDisplayInterface {
 	which we can write into the file and stdout
 	@param str - rotated words or metrics values
 	@return void
-	@see print nothing but append the rotated word or append the metrics output
+	@see print nothing but append output line for tree traversal and error message
 	*/
 	public void store(String str)
 	{
@@ -36,15 +40,15 @@ public class Results implements FileDisplayInterface, StdoutDisplayInterface {
 	}
 	
 
-	/*this is generic void method, which write output to output.txt or matrics.txt depends on
-	the instance (WordRotator/MatricsCalculator) used to call this method.
+	/*this is generic void method, which write output to all 3 output.txt or error.txt depends on
+	the instance used to call this method.
 	@param NA
 	@return void
 	@see write content of the StringBuffer into the file.
 	*/
 	public void writeToFile() throws IOException,InvalidPathException,SecurityException,FileNotFoundException
 	{
-		
+		MyLogger.writeMessage("Write to file method called", DebugLevel.RESULT);
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)));
 		
 		try
@@ -69,13 +73,14 @@ public class Results implements FileDisplayInterface, StdoutDisplayInterface {
 
 	}
 	
-	/*this is void method wich is used to write output to console.
+	/*this is void method which is used to write output to console.
 	@param NA
 	@return NA
-	@see content of StringBuffer (rotated words or metrics output of input.txt file)
+	@see write content of StringBuffer to stdout
 	 */
 	public void writeToStdout()
 	{
+		MyLogger.writeMessage("Write to stdout method called", DebugLevel.RESULT);
 		System.out.println(finalResult);	
 	}
 }

@@ -4,48 +4,50 @@ import java.util.HashSet;
 import java.util.Set;
 import studentskills.util.FileDisplayInterface;
 import studentskills.util.FileProcessor;
+import studentskills.util.MyLogger;
 import studentskills.util.Results;
-import studentskills.util.StdoutDisplayInterface;
-
+import studentskills.util.MyLogger.DebugLevel;
 
 public class TreeHelper {
 	
+	boolean invalidInput,isEmptyFile,isEmptyLine;
 
-	boolean invalidInput,isEmptyFile;
-
-	BST treeClone0;
-	BST treeClone1;
-	BST treeClone2;
+	BST treeClone0,treeClone1,treeClone2;
 	
-	SubjectI clone0;
-	SubjectI clone1;
-	SubjectI clone2;
+	SubjectI clone0,clone1,clone2;
 	
-	
+	//default TreeHelper constructor
 	public TreeHelper()
 	{
-
 		invalidInput = false;
 		isEmptyFile = false;
+		isEmptyLine = false;
+		treeClone0 = null;
+		treeClone1 = null;
+		treeClone2 = null;
+		clone0 = null;
+		clone1 = null;
+		clone2 = null;
+		MyLogger.writeMessage("TreeHelper constructor called", DebugLevel.CONSTRUCTOR);
 	}
 	
-	/*
+	
 	@Override
 	public String toString()
 	{
-		return "HelperClass [videoCount : "+videoCount+" popularity : "+popularity+" totalScore : "+totalScore+" videoName : "+videoName+" invalidInput : "+invalidInput+" isVideoPresentAdd : "+isVideoPresentAdd+
-			" isVideoPresentR : "+isVideoPresentR+" isDecrease : "+isDecrease+" isEmptyFile : "+isEmptyFile+"]"; 	
+		return "TreeHelper [invalidInput : "+invalidInput+" isEmptyFile : "+isEmptyFile+" isEmptyLine : "+isEmptyLine+" treeClone0 : "+treeClone0+" treeClone1 : "+treeClone1+" treeClone2 : "+treeClone2+
+			" clone0 : "+clone0+" clone1 : "+clone1+" clone2 : "+clone2+"]"; 	
 	}
-	*/
 	
-	/*this is a helper method which takes instances of 2 classes used to perform operations on input.txt file.
-	operations like fetching line by using poll() method of FileProcessor class, Store final result in
+	/*this is a helper method which takes instances of 2 classes used to perform operations on input file.
+	operations like fetching line by using poll() method of FileProcessor class, error message in
 	store method of Result class.
 	@param fp an instance of FileProcessor.java class from util package
-	@param res an instance of Results.java class from util package
+	@param errorRes an instance of Results.java class from util package
 	@return void
 	@see just an helper function for performing different operations on input.txt file like parse the input
-	store videos, calculate metrics then store output and display exceptions
+	store error message, create clone of nodes and recursively call insert for creating BST and insertUpdate function
+	to make any required changes
 	*/
 	public void InputParser(FileProcessor fp,FileDisplayInterface errorRes) throws IOException, CloneNotSupportedException
 	{
@@ -79,7 +81,7 @@ public class TreeHelper {
 				 String temp = values[0];
 				 
 				 bNumber = Integer.parseInt(temp.replaceAll("^|:.*$",""));
-				 
+
 				 firstName = temp.replaceAll("^.*:|$","");
 				 lastName  = values[1];
 				 gpa = Double.parseDouble(values[2]);
@@ -93,7 +95,6 @@ public class TreeHelper {
 					 i++;	 
 				 }
 				 
-				 
 				 clone0 = new StudentRecord(bNumber,firstName,lastName,gpa,major,skill);
 				 clone1 = ((StudentRecord)clone0).clone();
 				 clone2 = ((StudentRecord)clone0).clone();
@@ -103,30 +104,23 @@ public class TreeHelper {
 				 clone1.registerObservers((StudentRecord)clone0,(StudentRecord)clone2);
 				 clone2.registerObservers((StudentRecord)clone0, (StudentRecord)clone1);
 				 
-				 
-				 
 				 if(null == tempNode)
 				 {
-					  
 					 insert(treeClone0,clone0);
 					 insert(treeClone1,clone1);
-					 insert(treeClone2,clone2);	 
-					 
-					 
+					 insert(treeClone2,clone2);	  
 				 }
 				 else
 				 {
 					 insertUpdateNode(treeClone0, clone0);
 					 clone0.notifyAll(tempNode,null,null, Operation.INSERT);
 				 }
-
-				 
 				 line = fp.poll();
 			}
 
 			 
 		}
-		catch(Exception e)
+		catch(IOException | CloneNotSupportedException e)
 		{
 			e.printStackTrace();
 			System.exit(0);
@@ -145,6 +139,10 @@ public class TreeHelper {
 			{
 				throw new IOException("File is Empty! Exiting!!!");
 			}
+			else if(isEmptyLine)
+			{
+				throw new IOException("empty line in input file! Exiting!!!");
+			}
 			
 		}
 		catch(IOException ie)
@@ -156,10 +154,17 @@ public class TreeHelper {
 		{
 			fp.close();
 		}
-		
-
 	}
 
+	/*this is a helper method which takes instances of 2 classes used to perform operations on modification file.
+	operations like fetching line by using poll() method of FileProcessor class,write error message in
+	store method of Results class.
+	@param fp an instance of FileProcessor.java class from util package
+	@param errorRes,outputRes1,outputRes2,outputRes3 an instance of Results.java class from util package
+	@return void
+	@see just an helper function for performing different operations on mod file like parse the input, make modification
+	in corresponding replica tree,store error message, also stores the final output into store method by calling printNodes method.
+	*/
 	public void modFileParser(FileProcessor fp,FileDisplayInterface outputRes1,FileDisplayInterface outputRes2,FileDisplayInterface outputRes3,FileDisplayInterface errorRes) throws IOException
 	{
 		int bNumber, replicaID;
@@ -219,7 +224,6 @@ public class TreeHelper {
 				 		 
 			}
 			
-			
 			printNodes((Results)outputRes1,treeClone0.root);
 			printNodes((Results)outputRes2,treeClone1.root);
 			printNodes((Results)outputRes3,treeClone2.root);
@@ -257,8 +261,15 @@ public class TreeHelper {
 		}
 	}
 	
+	/*this is a insert method which takes 2 parameters, one is tree BST and another is node to insert into that BST.
+	@param bst instance of bst class
+	@param node instance of StudentRecord
+	@return void
+	@see just an insert fucntion to insert into BST
+	*/
 	public void insert(BST bst,SubjectI node)
 	{
+		MyLogger.writeMessage("Insert method for BST called", DebugLevel.BST);
 		if(null == bst.root)
 		{
 			bst.root = node;
@@ -298,7 +309,13 @@ public class TreeHelper {
 		
 	}
 	
-
+	/*this is a set method which takes 2 parameters, old node and new node. Make changes into the node present into to tree 
+	 as per new node.
+	@param oldNode instance of StudentRecord
+	@param newNode instance of StudentRecord
+	@return void
+	@see just an helper update function for insertUpdate method
+	*/
 	public void setEntry(SubjectI oldNode, SubjectI newNode)
 	{
 		oldNode.setFirstName(newNode.getFirstName());
@@ -308,10 +325,17 @@ public class TreeHelper {
 		oldNode.getSkills().addAll(newNode.getSkills());
 	}
 	
+	/*this is a insertUpdateNode method which takes 2 parameters, one is tree BST and another is node which need to be updated
+	@param bst instance of bst class
+	@param node instance of StudentRecord
+	@return void
+	@see just an update function need to be updated while inserting node in to the BST
+	*/
 	public void insertUpdateNode(BST bst,SubjectI node)
 	{
 		SubjectI current = bst.root;
 		SubjectI parent = null;
+		MyLogger.writeMessage("At the time of parsing input file, update is called if new line came with same bNumber", DebugLevel.UPDATE);
 		while(true)
 		{
 			parent = current;
@@ -339,15 +363,17 @@ public class TreeHelper {
 					return;
 				}
 			}
-
 		}
-		
-
 	}
 	
+	/*this is a search method which takes 2 parameters, one is key need to be search in BST and another is root of BST
+	@param int key(bNumber)
+	@param root of BST
+	@return found node i.e StudentRecord
+	@see just an serach function which returns node if found and null otherwise
+	*/
 	public SubjectI Search(int key,SubjectI root)
 	{
-	
 		SubjectI temp = null;
 		if(null == root)
 		{
@@ -368,9 +394,18 @@ public class TreeHelper {
 				temp = Search(key,root.getLeft());
 			}
 		}
+		MyLogger.writeMessage("Search method for BST called", DebugLevel.BST);
 		return temp;
 	}
 	
+	/*this is a printNode method which takes 2 parameters, one is result instance need to write into the tree and
+	 another is root node of BST
+	@param outRes of Results class
+	@param root node of BST, instance of StudentRecord
+	@return void
+	@see just an method which stores the bNumber and Skills into StringBuffer by calling store method to write it
+	into the output file and to stdout
+	*/
 	public void printNodes(Results outRes, SubjectI root)
 	{
 		if(null != root)
@@ -378,13 +413,9 @@ public class TreeHelper {
 			printNodes(outRes,root.getLeft());
 			outRes.store(String.valueOf(root.getbNumber()));
 			outRes.store(":");
-			outRes.store(root.getFirstName());
-			outRes.store(",");
 			outRes.store(String.join(",",root.getSkills()));
 			outRes.store("\n");
 			printNodes(outRes,root.getRight());
 		}
 	}
-
-
 }
