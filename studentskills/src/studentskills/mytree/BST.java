@@ -1,5 +1,8 @@
 package studentskills.mytree;
 
+import studentskills.util.MyLogger;
+import studentskills.util.MyLogger.DebugLevel;
+
 public class BST implements Cloneable{
 
 
@@ -10,6 +13,7 @@ public class BST implements Cloneable{
 	{
 		treeID = Utility.getUniqueId();
 		root = null;
+		MyLogger.writeMessage("BST constructor called", DebugLevel.CONSTRUCTOR);
 	}
 	
 	@Override

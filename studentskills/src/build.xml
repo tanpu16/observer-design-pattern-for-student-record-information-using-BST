@@ -1,4 +1,4 @@
-<project name="channelpopularity" default="compile_all" basedir="..">
+<project name="studentskills" default="compile_all" basedir="..">
 
   <property name="BUILD.compiler"       value="modern"/>
   <property name="src"                  value="src"/>
@@ -8,7 +8,7 @@
   <target name="all" depends="compile_all"/>
 
   <target name="compile_all"
-          depends="channelpopularity"/>
+          depends="studentskills"/>
 
   <target name="clean">
        <delete dir="${BUILD}"/>
@@ -22,9 +22,9 @@
 
  <target name="jar">
         <mkdir dir="${BUILD}/jar"/>
-        <jar destfile="${BUILD}/jar/channelpopularity.jar" basedir="${BUILD}/classes">
+        <jar destfile="${BUILD}/jar/studentskills.jar" basedir="${BUILD}/classes">
             <manifest>
-                <attribute name="Main-Class" value="channelpopularity.driver.Driver"/>
+                <attribute name="Main-Class" value="studentskills.driver.Driver"/>
             </manifest>
         </jar>
     </target>
@@ -33,9 +33,9 @@
   <!-- * means all files in the current directory -->
   <!-- for just java files use *.java -->
 
-  <target name="channelpopularity" depends="prepare">
+  <target name="studentskills" depends="prepare">
     <javac includeantruntime="false" srcdir="${src}"
-	           includes="channelpopularity/**"
+	           includes="studentskills/**"
            excludes="**/package.html"
            destdir="${classes}"
            classpath="${classes}"
@@ -45,9 +45,14 @@
   </target>
 
 <target name="run" depends="jar">
-        <java jar="${BUILD}/jar/channelpopularity.jar"  fork="true">
+        <java jar="${BUILD}/jar/studentskills.jar"  fork="true">
 	<arg value="${input}"/> <!-- input file -->
-	<arg value="${output}"/> <!-- output file -->
+	<arg value="${modify}"/> <!-- output file -->
+	<arg value="${output1}"/> <!-- output1 file -->
+	<arg value="${output2}"/> <!-- output2 file -->
+	<arg value="${output3}"/> <!-- output3 file -->
+	<arg value="${error}"/> <!-- error file -->
+	<arg value="${debug}"/> <!-- debug -->
         </java>	
     </target>
 

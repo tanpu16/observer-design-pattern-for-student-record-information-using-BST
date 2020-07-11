@@ -1,6 +1,8 @@
 package studentskills.util;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 
@@ -40,7 +42,7 @@ public class Results implements FileDisplayInterface, StdoutDisplayInterface {
 	@return void
 	@see write content of the StringBuffer into the file.
 	*/
-	public void writeToFile() throws IOException
+	public void writeToFile() throws IOException,InvalidPathException,SecurityException,FileNotFoundException
 	{
 		
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(path)));
@@ -50,7 +52,12 @@ public class Results implements FileDisplayInterface, StdoutDisplayInterface {
 			bw.write(finalResult.toString());
 			bw.close();
 		}
-		catch(IOException e)
+		catch (InvalidPathException | SecurityException | FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(0);
+		} 
+		catch(IOException  e)
 		{
 			e.printStackTrace();
 			System.exit(0);

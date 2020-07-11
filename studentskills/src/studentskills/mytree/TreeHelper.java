@@ -1,11 +1,7 @@
 package studentskills.mytree;
-
 import java.io.IOException;
-
 import java.util.HashSet;
-
 import java.util.Set;
-
 import studentskills.util.FileDisplayInterface;
 import studentskills.util.FileProcessor;
 import studentskills.util.Results;
@@ -51,7 +47,7 @@ public class TreeHelper {
 	@see just an helper function for performing different operations on input.txt file like parse the input
 	store videos, calculate metrics then store output and display exceptions
 	*/
-	public void InputParser(FileProcessor fp) throws IOException, CloneNotSupportedException
+	public void InputParser(FileProcessor fp,FileDisplayInterface errorRes) throws IOException, CloneNotSupportedException
 	{
 		int bNumber;
 		String firstName,lastName,major;
@@ -123,25 +119,11 @@ public class TreeHelper {
 					 insertUpdateNode(treeClone0, clone0);
 					 clone0.notifyAll(tempNode,null,null, Operation.INSERT);
 				 }
-				 
 
-				 //System.out.println("in input : "+clone0.getFirstName()+" "+clone1.getFirstName()+" "+clone2.getFirstName());
-				 
-				 //System.out.println("observers "+clone1.getObservers());
 				 
 				 line = fp.poll();
 			}
 
-			/*
-			System.out.println("Replica tree 0");
-			treeClone0.display(treeClone0.root);
-			
-			System.out.println("Replica tree 1");
-			treeClone1.display(treeClone1.root);
-			
-			System.out.println("Replica tree 2");
-			treeClone2.display(treeClone2.root);
-			*/
 			 
 		}
 		catch(Exception e)
@@ -178,7 +160,7 @@ public class TreeHelper {
 
 	}
 
-	public void modFileParser(FileProcessor fp,FileDisplayInterface outputRes1,FileDisplayInterface outputRes2,FileDisplayInterface outputRes3,StdoutDisplayInterface outStdout1,StdoutDisplayInterface outStdout2,StdoutDisplayInterface outStdout3) throws IOException
+	public void modFileParser(FileProcessor fp,FileDisplayInterface outputRes1,FileDisplayInterface outputRes2,FileDisplayInterface outputRes3,FileDisplayInterface errorRes) throws IOException
 	{
 		int bNumber, replicaID;
 		String oldValue,newValue;
@@ -206,33 +188,41 @@ public class TreeHelper {
 				String temp = split[2];
 				oldValue = temp.replaceAll("^|:.*$","");
 				newValue = temp.replaceAll("^.*:|$","");
-				 
-				SubjectI tempNode = null;
 				
-				if(replicaID == treeClone0.getTreeID())
+				
+				if(!newValue.isEmpty())
 				{
-					tempNode = Search(bNumber, treeClone0.root);
+					SubjectI tempNode = null;
 					
+					if(replicaID == treeClone0.getTreeID())
+					{
+						tempNode = Search(bNumber, treeClone0.root);	
+					}
+					else if(replicaID == treeClone1.getTreeID())
+					{
+						tempNode = Search(bNumber, treeClone1.root);
+					}
+					else if(replicaID == treeClone2.getTreeID())
+					{
+						 tempNode = Search(bNumber, treeClone2.root);
+						
+					}
+					tempNode.updateSubjectNode(tempNode,oldValue,newValue);
+					tempNode.notifyAll(tempNode,oldValue,newValue,Operation.MODIFY);
+					line = fp.poll();
 				}
-				else if(replicaID == treeClone1.getTreeID())
+				else
 				{
-					tempNode = Search(bNumber, treeClone1.root);
+					errorRes.store("Input is invalid : request for modified value is empty");
+					line = fp.poll();
 				}
-				else if(replicaID == treeClone2.getTreeID())
-				{
-					 tempNode = Search(bNumber, treeClone2.root);
-					
-				}
-				tempNode.updateSubjectNode(tempNode,oldValue,newValue);
-				tempNode.notifyAll(tempNode,oldValue,newValue,Operation.MODIFY);
-			
-				 line = fp.poll();
+				 		 
 			}
 			
 			
-			printNodes((Results)outputRes1,(Results)outStdout1,treeClone0.root);
-			printNodes((Results)outputRes2,(Results)outStdout2,treeClone1.root);
-			printNodes((Results)outputRes3,(Results)outStdout3,treeClone2.root);
+			printNodes((Results)outputRes1,treeClone0.root);
+			printNodes((Results)outputRes2,treeClone1.root);
+			printNodes((Results)outputRes3,treeClone2.root);
 				 
 		}
 		catch(IOException e)
@@ -381,20 +371,18 @@ public class TreeHelper {
 		return temp;
 	}
 	
-	public void printNodes(Results outRes,Results outStd, SubjectI root)
+	public void printNodes(Results outRes, SubjectI root)
 	{
 		if(null != root)
 		{
-			printNodes(outRes,outStd,root.getLeft());
+			printNodes(outRes,root.getLeft());
 			outRes.store(String.valueOf(root.getbNumber()));
 			outRes.store(":");
+			outRes.store(root.getFirstName());
+			outRes.store(",");
 			outRes.store(String.join(",",root.getSkills()));
 			outRes.store("\n");
-			outStd.store(String.valueOf(root.getbNumber()));
-			outStd.store(":");
-			outStd.store(String.join(",",root.getSkills()));
-			outStd.store("\n");
-			printNodes(outRes,outStd,root.getRight());
+			printNodes(outRes,root.getRight());
 		}
 	}
 

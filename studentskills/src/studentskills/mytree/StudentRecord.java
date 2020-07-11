@@ -1,7 +1,6 @@
 package studentskills.mytree;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -35,12 +34,6 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 		StudentRecord clone = null;
         try{
             clone = (StudentRecord)super.clone()	;
- 
-            //clone.firstName = new String(clone.getFirstName());
-            //clone.lastName = new String(clone.getLastName());
-            //clone.gpa = new Double(clone.getGpa());
-            //clone.bNumber = new Integer(clone.getbNumber());
-            //clone.major = new String(clone.getMajor());
             clone.left = clone.getLeft();
             clone.right = clone.getRight();
             clone.skills = new HashSet<String>(clone.getSkills());

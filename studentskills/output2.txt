@@ -1,5 +1,5 @@
-1024:Skill8,Skill7,Skill2,Skill1,Skill9
-1124:Skill8,Skill7,Skill6,Skill4,Skill3,Skill2,Skill9
-1234:Skill5,Skill4,Skill3,Skill2,Skill9
-2345:Skill8,Skill7,Skill6,Skill5,Skill4,Skill3,Skill1,Skill0,Skill9
-2346:Skill8,Skill7,Skill5,Skill4,Skill3,Skill9
+1024:Sindhu,Skill8,Skill7,Skill2,Skill1,Skill9
+1124:Jane,Skill8,Skill7,Skill6,Skill4,Skill3,Skill2,Skill9
+1234:John,Skill5,Skill4,Skill3,Skill2,Skill9
+2345:John,Skill8,Skill7,Skill6,Skill5,Skill4,Skill3,Skill1,Skill0,Skill9
+2346:Pranita,Skill8,Skill7,Skill5,Skill4,Skill3,Skill9
