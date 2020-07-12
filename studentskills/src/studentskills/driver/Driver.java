@@ -46,7 +46,7 @@ public class Driver {
 
 		
 			fp = new FileProcessor(args[0]);
-			hp.InputParser(fp,errorRes);
+			hp.inputParser(fp,errorRes);
 		
 			fp = new FileProcessor(args[1]);
 			hp.modFileParser(fp,outputRes1,outputRes2,outputRes3,errorRes);
@@ -70,7 +70,7 @@ public class Driver {
 			e.printStackTrace();
 			System.exit(0);
 		} 
-		 catch (IOException ie)
+		catch (IOException ie)
 		{
 			ie.printStackTrace();
 			System.exit(0);

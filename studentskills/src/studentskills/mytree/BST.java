@@ -4,7 +4,7 @@ import studentskills.util.MyLogger;
 import studentskills.util.MyLogger.DebugLevel;
 import studentskills.util.Utility;
 
-public class BST implements Cloneable{
+public class BST{
 
 
 	private final int treeID;

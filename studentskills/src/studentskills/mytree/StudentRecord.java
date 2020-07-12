@@ -214,12 +214,10 @@ public class StudentRecord implements SubjectI,ObserverI,Cloneable
 	*/
 	public void registerObservers(ObserverI obs1,ObserverI obs2)
 	{
-		
 		observers.add(obs1);
 		observers.add(obs2);
 		
 		MyLogger.writeMessage("register observers method", DebugLevel.REGISTER);
-		
 	}
 	
 	/*this method called from notifyAll method, which updates the observers for corresponding subject and also

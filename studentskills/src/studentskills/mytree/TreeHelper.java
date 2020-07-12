@@ -49,7 +49,7 @@ public class TreeHelper {
 	store error message, create clone of nodes and recursively call insert for creating BST and insertUpdate function
 	to make any required changes
 	*/
-	public void InputParser(FileProcessor fp,FileDisplayInterface errorRes) throws IOException, CloneNotSupportedException
+	public void inputParser(FileProcessor fp,FileDisplayInterface errorRes) throws IOException, CloneNotSupportedException, NumberFormatException
 	{
 		int bNumber;
 		String firstName,lastName,major;
@@ -74,53 +74,63 @@ public class TreeHelper {
 				{
 					invalidInput = true;
 				}
-
 				 Set<String> skill = new HashSet<String>();
 				 String[] values = line.split(",");
-				 
 				 String temp = values[0];
-				 
-				 bNumber = Integer.parseInt(temp.replaceAll("^|:.*$",""));
-
-				 firstName = temp.replaceAll("^.*:|$","");
-				 lastName  = values[1];
-				 gpa = Double.parseDouble(values[2]);
-				 major = values[3];
-				 int len = values.length;
-				 int i = 4;
-				 while(len-4 > 0 && i < 14)
+				 String split[] = line.split(":");
+				 if(split[0].length() == 0)
 				 {
-					 skill.add(values[i]);
-					 len--;
-					 i++;	 
+					 errorRes.store("Input is invalid : request contains empty line in \"input\" file\n");
 				 }
-				 
-				 clone0 = new StudentRecord(bNumber,firstName,lastName,gpa,major,skill);
-				 clone1 = ((StudentRecord)clone0).clone();
-				 clone2 = ((StudentRecord)clone0).clone();
-				 SubjectI tempNode = Search(bNumber, treeClone0.root);
-				 
-				 clone0.registerObservers((StudentRecord)clone1,(StudentRecord)clone2);
-				 clone1.registerObservers((StudentRecord)clone0,(StudentRecord)clone2);
-				 clone2.registerObservers((StudentRecord)clone0, (StudentRecord)clone1);
-				 
-				 if(null == tempNode)
+				 else if(Integer.parseInt(split[0]) < 0)
 				 {
-					 insert(treeClone0,clone0);
-					 insert(treeClone1,clone1);
-					 insert(treeClone2,clone2);	  
+					 errorRes.store("Input is invalid : bNumber is negative in \"input\" file\n");
 				 }
 				 else
 				 {
-					 insertUpdateNode(treeClone0, clone0);
-					 clone0.notifyAll(tempNode,null,null, Operation.INSERT);
-				 }
+					 	bNumber = Integer.parseInt(split[0]);
+					 	firstName = temp.replaceAll("^.*:|$","");
+					 	lastName  = values[1];
+					 	gpa = Double.parseDouble(values[2]);
+					 	major = values[3];
+					 					 
+					 	int len = values.length;
+					 	int i = 4;
+					 	while(len-4 > 0 && i < 14)
+					 	{
+					 		skill.add(values[i]);
+					 		len--;
+					 		i++;	 
+					 	}
+					  
+					 	clone0 = new StudentRecord(bNumber,firstName,lastName,gpa,major,skill);
+					 	clone1 = ((StudentRecord)clone0).clone();
+					 	clone2 = ((StudentRecord)clone0).clone();
+					 	SubjectI tempNode = Search(bNumber, treeClone0.root);
+				 
+					 	clone0.registerObservers((StudentRecord)clone1,(StudentRecord)clone2);
+					 	clone1.registerObservers((StudentRecord)clone0,(StudentRecord)clone2);
+					 	clone2.registerObservers((StudentRecord)clone0, (StudentRecord)clone1);
+				 
+					 	if(null == tempNode)
+					 	{
+					 		insert(treeClone0,clone0);
+					 		insert(treeClone1,clone1);
+					 		insert(treeClone2,clone2);	  
+					 	}
+					 	else
+					 	{
+					 		insertUpdateNode(treeClone0, clone0);
+					 		clone0.notifyAll(tempNode,null,null, Operation.INSERT);
+					 	}
+				   }
+				 
 				 line = fp.poll();
 			}
 
 			 
 		}
-		catch(IOException | CloneNotSupportedException e)
+		catch(IOException | CloneNotSupportedException| NumberFormatException e)
 		{
 			e.printStackTrace();
 			System.exit(0);
@@ -173,55 +183,64 @@ public class TreeHelper {
 		try
 		{
 			String line = fp.poll();
-			
 			if(null == line)
 			{
 				isEmptyFile = true;
 			}
-			
 			while(null != line)
 			{
 				if(line.contains(" "))
 				{
 					invalidInput = true;
-				}
-				 
-				
+				}	
 				String split[] = line.split(",");
-				replicaID = Integer.parseInt(split[0]);
-				bNumber = Integer.parseInt(split[1]);
-				String temp = split[2];
-				oldValue = temp.replaceAll("^|:.*$","");
-				newValue = temp.replaceAll("^.*:|$","");
 				
-				
-				if(!newValue.isEmpty())
+				if(split[0].length() == 0)
 				{
-					SubjectI tempNode = null;
-					
-					if(replicaID == treeClone0.getTreeID())
-					{
-						tempNode = Search(bNumber, treeClone0.root);	
-					}
-					else if(replicaID == treeClone1.getTreeID())
-					{
-						tempNode = Search(bNumber, treeClone1.root);
-					}
-					else if(replicaID == treeClone2.getTreeID())
-					{
-						 tempNode = Search(bNumber, treeClone2.root);
-						
-					}
-					tempNode.updateSubjectNode(tempNode,oldValue,newValue);
-					tempNode.notifyAll(tempNode,oldValue,newValue,Operation.MODIFY);
-					line = fp.poll();
+				  errorRes.store("Input is invalid : request contains empty line in \"modify\" file\n");
+				}
+				else if(Integer.parseInt(split[0]) < 0 || Integer.parseInt(split[1]) < 0)
+				{
+					errorRes.store("Input is invalid : request contains negative Replica ID/bNumber \"modify\" file\n");
 				}
 				else
 				{
-					errorRes.store("Input is invalid : request for modified value is empty");
-					line = fp.poll();
+					replicaID = Integer.parseInt(split[0]);
+					bNumber = Integer.parseInt(split[1]);
+					String temp = split[2];
+					oldValue = temp.replaceAll("^|:.*$","");
+					newValue = temp.replaceAll("^.*:|$","");
+				  	  
+					if(!newValue.isEmpty())
+					{
+						SubjectI tempNode = null;
+					
+						if(replicaID == treeClone0.getTreeID())
+						{
+							tempNode = Search(bNumber, treeClone0.root);	
+						}
+						else if(replicaID == treeClone1.getTreeID())
+						{
+							tempNode = Search(bNumber, treeClone1.root);
+						}
+						else if(replicaID == treeClone2.getTreeID())
+						{
+							tempNode = Search(bNumber, treeClone2.root);
+						}
+						if(null != tempNode)
+						{
+							tempNode.updateSubjectNode(tempNode,oldValue,newValue);
+							tempNode.notifyAll(tempNode,oldValue,newValue,Operation.MODIFY);
+						}
+					}
+					else
+					{
+						errorRes.store("Input is invalid : request for modified value is empty\n");
+					}
+				
+					
 				}
-				 		 
+				line = fp.poll();
 			}
 			
 			printNodes((Results)outputRes1,treeClone0.root);
